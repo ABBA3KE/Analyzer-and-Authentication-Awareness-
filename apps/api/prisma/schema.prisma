@@ -1,0 +1,220 @@
+// Password Strength Analyser & Authentication Awareness System
+// Prisma schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum AssessmentType {
+  PRE_TEST
+  POST_TEST
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(STUDENT)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  studentProfile      StudentProfile?
+  quizAttempts        QuizAttempt[]
+  moduleProgress      ModuleProgress[]
+  awarenessAssessments AwarenessAssessment[]
+  passwordResetTokens PasswordResetToken[]
+
+  @@index([email])
+}
+
+model StudentProfile {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName     String
+  studentId    String?  @unique
+  department   String?
+  polytechnic  String?
+  level        String?
+  photoUrl     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model LearningModule {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String
+  category    String
+  difficulty  Difficulty @default(BEGINNER)
+  objectives  String[]
+  durationMin Int      @default(15)
+  order       Int      @default(0)
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  lessons   Lesson[]
+  quizzes   Quiz[]
+  progress  ModuleProgress[]
+
+  @@index([isPublished, order])
+}
+
+model Lesson {
+  id          String   @id @default(cuid())
+  moduleId    String
+  module      LearningModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  title       String
+  content     String
+  keyTakeaways String[]
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([moduleId, order])
+}
+
+model Quiz {
+  id          String   @id @default(cuid())
+  moduleId    String?
+  module      LearningModule? @relation(fields: [moduleId], references: [id], onDelete: SetNull)
+  title       String
+  description String?
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  questions Question[]
+  attempts  QuizAttempt[]
+
+  @@index([moduleId])
+}
+
+model Question {
+  id          String       @id @default(cuid())
+  quizId      String
+  quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  type        QuestionType @default(MULTIPLE_CHOICE)
+  prompt      String
+  options     String[]
+  correctIndex Int
+  explanation String
+  topic       String
+  difficulty  Difficulty   @default(BEGINNER)
+  order       Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  answers QuizAnswer[]
+
+  @@index([quizId, order])
+}
+
+model QuizAttempt {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quizId     String
+  quiz       Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  score      Int
+  totalQuestions Int
+  startedAt  DateTime @default(now())
+  completedAt DateTime?
+
+  answers QuizAnswer[]
+
+  @@index([userId, quizId])
+}
+
+model QuizAnswer {
+  id            String      @id @default(cuid())
+  attemptId     String
+  attempt       QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId    String
+  question      Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedIndex Int
+  isCorrect     Boolean
+
+  @@index([attemptId])
+}
+
+model ModuleProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  moduleId    String
+  module      LearningModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  percentComplete Int  @default(0)
+  isCompleted Boolean  @default(false)
+  lastAccessed DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, moduleId])
+  @@index([userId])
+}
+
+model AwarenessAssessment {
+  id        String         @id @default(cuid())
+  userId    String
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      AssessmentType
+  scorePercent Int
+  takenAt   DateTime       @default(now())
+
+  responses AwarenessResponse[]
+
+  @@index([userId, type])
+}
+
+model AwarenessResponse {
+  id           String   @id @default(cuid())
+  assessmentId String
+  assessment   AwarenessAssessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  topic        String
+  isCorrect    Boolean
+
+  @@index([assessmentId])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model SystemSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+  updatedAt DateTime @updatedAt
+}
