@@ -57,7 +57,7 @@ export function StatCard({
   label: string;
   value: string | number;
   hint?: string;
-  icon?: React.ComponentType<{ size?: number; className?: string }>;
+  icon?: React.ComponentType<{ size?: number | string; className?: string }>;
   trend?: Trend;
 }) {
   const isGood = trend ? (trend.direction === "up") === (trend.positive ?? true) : true;

@@ -14,7 +14,7 @@ import { toClient, toClientList } from "../utils/serialize.js";
 export const getProfile = asyncHandler(async (req: Request, res: Response) => {
   const user = await User.findById(req.user!.sub);
   if (!user?.profile) throw new AppError("Profile not found.", 404);
-  res.json({ id: user.id, ...user.profile.toObject() });
+  res.json({ id: user.id, ...user.profile });
 });
 
 export const updateProfile = asyncHandler(async (req: Request, res: Response) => {
@@ -24,7 +24,7 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response) =>
     { new: true }
   );
   if (!user?.profile) throw new AppError("Profile not found.", 404);
-  res.json({ id: user.id, ...user.profile.toObject() });
+  res.json({ id: user.id, ...user.profile });
 });
 
 export const listModules = asyncHandler(async (_req: Request, res: Response) => {

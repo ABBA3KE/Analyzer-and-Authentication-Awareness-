@@ -84,7 +84,7 @@ export default function AdminDashboard() {
   );
 }
 
-function BigMetric({ value, icon: Icon }: { value: number | null; icon: React.ComponentType<{ size?: number; className?: string }> }) {
+function BigMetric({ value, icon: Icon }: { value: number | null; icon: React.ComponentType<{ size?: number | string; className?: string }> }) {
   return (
     <div className="flex items-center gap-3">
       <span className="flex h-10 w-10 items-center justify-center rounded-md bg-signal/10 text-signal">

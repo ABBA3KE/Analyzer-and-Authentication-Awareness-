@@ -28,7 +28,7 @@ export const listStudents = asyncHandler(async (req: Request, res: Response) => 
       email: u.email,
       isActive: u.isActive,
       createdAt: u.createdAt,
-      studentProfile: u.profile ? u.profile.toObject() : null,
+      studentProfile: u.profile ? { ...u.profile } : null,
     }))
   );
 });
@@ -48,7 +48,7 @@ export const getStudentDetail = asyncHandler(async (req: Request, res: Response)
     email: user.email,
     isActive: user.isActive,
     createdAt: user.createdAt,
-    studentProfile: user.profile ? user.profile.toObject() : null,
+    studentProfile: user.profile ? { ...user.profile } : null,
     moduleProgress: moduleProgress.map((mp) => ({
       ...toClient(mp as any),
       module: mp.moduleId && typeof mp.moduleId === "object" ? toClient(mp.moduleId as any) : null,

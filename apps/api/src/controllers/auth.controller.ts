@@ -45,6 +45,6 @@ export const me = asyncHandler(async (req: Request, res: Response) => {
     role: user.role,
     // The embedded profile subdocument carries `id` from its parent user,
     // so the shape matches the frontend's StudentProfile type exactly.
-    profile: user.profile ? { id: user.id, ...user.profile.toObject() } : null,
+    profile: user.profile ? { id: user.id, ...user.profile } : null,
   });
 });
