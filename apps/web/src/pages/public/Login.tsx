@@ -140,9 +140,9 @@ export default function Login() {
             </Button>
           </form>
 
-          <p className="mt-5 text-center text-xs text-mist-500">
+          {/* <p className="mt-5 text-center text-xs text-mist-500">
             Demo accounts (development only): admin@localhost.test / student@localhost.test
-          </p>
+          </p> */}
         </div>
         <p className="mt-5 text-center text-sm text-mist-400">
           New here? <Link to="/register" className="font-medium text-signal hover:underline">Create an account</Link>
