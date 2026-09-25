@@ -9,7 +9,7 @@ function setSessionCookie(res: Response, token: string) {
   res.cookie(env.cookieName, token, {
     httpOnly: true,
     secure: env.isProd,
-    sameSite: env.isProd ? "none" : "lax",
+    sameSite: "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 }

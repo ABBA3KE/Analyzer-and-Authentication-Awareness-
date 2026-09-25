@@ -1,6 +1,6 @@
 // Thin fetch wrapper. Sends cookies for session auth; never used by the
 // password analyser, which stays entirely client-side.
-const BASE = `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api`;
+const BASE = "/api";
 
 class ApiError extends Error {
   status: number;
